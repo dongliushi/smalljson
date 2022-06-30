@@ -45,9 +45,10 @@ public:
   Value(Array arr);
   Value &operator=(const Value &rhs);
   Value &operator=(Value &&rhs) = default;
-  void print();
 
 public:
+  void print();
+  std::string to_string();
   template <typename... Args>
   Value(ValueType type, Args &&...args)
       : type_(type), value_data_(std::forward<Args>(args)...) {
@@ -75,7 +76,10 @@ public:
       : object_data_(init_list) {}
   Object &operator=(const Object &rhs) = default;
   Object &operator=(Object &&rhs) = default;
+
+public:
   void print();
+  std::string to_string();
 
 private:
   object_t object_data_;
@@ -96,7 +100,9 @@ public:
   Array &operator=(const Array &rhs) = default;
   Array &operator=(Array &&rhs) = default;
 
+public:
   void print();
+  std::string to_string();
 
 private:
   array_t array_data_;
@@ -112,7 +118,6 @@ public:
 private:
   Parser(const std::string &json_data)
       : cur_(json_data.begin()), end_(json_data.end()) {}
-
   Value parseStart();
   Value parseObject();
   Value parseArray();

@@ -26,6 +26,24 @@ void Value::deepCopy(const Value::value_t &rhs) {
   }
 }
 
+std::string Value::to_string() {
+  switch (type_) {
+  case ValueType::Null:
+    return "null";
+  case ValueType::Boolean:
+  case ValueType::Number:
+    return std::get<std::string>(value_data_);
+  case ValueType::String:
+    return "\"" + std::get<std::string>(value_data_) + "\"";
+  case ValueType::Object:
+    return std::get<object_ptr>(value_data_)->to_string();
+  case ValueType::Array:
+    return std::get<array_ptr>(value_data_)->to_string();
+  default:
+    throw Exception(Exception::ParseError::NOT_JSON);
+  }
+}
+
 void Value::print() {
   if (auto pval = std::get_if<std::string>(&value_data_)) {
     std::cout << *pval << std::endl;
@@ -43,10 +61,30 @@ void Object::print() {
   }
 }
 
+std::string Object::to_string() {
+  std::string str = "{";
+  for (auto &[key, value] : object_data_) {
+    str += "\"" + escapeJson(key) + "\":" + value.to_string() + ",";
+  }
+  str.pop_back();
+  str += "}";
+  return str;
+}
+
 void Array::print() {
   for (auto &x : array_data_) {
     x.print();
   }
+}
+
+std::string Array::to_string() {
+  std::string str = "[";
+  for (auto &value : array_data_) {
+    str += value.to_string() + ",";
+  }
+  str.pop_back();
+  str += "]";
+  return str;
 }
 
 Value Parser::parseStart() {
