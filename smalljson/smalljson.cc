@@ -3,10 +3,21 @@
 #include <iostream>
 
 namespace smalljson {
-Value::Value(Array arr)
+std::string escapeJson(const std::string &str);
+
+std::string unescapeJson(const std::string &str);
+
+Value::Value(const Array &arr)
+    : type_(ValueType::Array), value_data_(std::make_unique<Array>(arr)) {}
+
+Value::Value(Array &&arr)
     : type_(ValueType::Array),
       value_data_(std::make_unique<Array>(std::move(arr))) {}
-Value::Value(Object obj)
+
+Value::Value(const Object &obj)
+    : type_(ValueType::Object), value_data_(std::make_unique<Object>(obj)) {}
+
+Value::Value(Object &&obj)
     : type_(ValueType::Object),
       value_data_(std::make_unique<Object>(std::move(obj))) {}
 
@@ -49,7 +60,6 @@ const std::string Value::to_string() const {
 }
 
 Array &Value::to_array() {
-  std::cout << "1\n";
   if (isArray()) {
     return *std::get<array_ptr>(value_data_);
   }
@@ -76,6 +86,10 @@ const Object &Value::to_object() const {
   }
   throw Exception(Exception::ParseError::BAD_TYPE);
 }
+
+Value &Value::at(size_t idx) { return to_array().at(idx); }
+
+Value &Value::at(const std::string &key) { return to_object().at(key); }
 
 const Value &Value::at(size_t idx) const { return to_array().at(idx); }
 

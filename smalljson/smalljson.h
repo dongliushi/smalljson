@@ -28,6 +28,7 @@ public:
 
 public:
   Value() : type_(ValueType::Null) {}
+  ~Value() = default;
   Value(size_t num)
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
   Value(ssize_t num)
@@ -36,13 +37,17 @@ public:
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
   Value(double num)
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
+  Value(bool boolean)
+      : type_(ValueType::Boolean), value_data_(boolean ? "true" : "false") {}
   Value(const std::string &str)
       : type_(ValueType::String), value_data_(std::move(str)) {}
   Value(const char *str) : type_(ValueType::String), value_data_(str) {}
   Value(const Value &rhs) : type_(rhs.type_) { deepCopy(rhs.value_data_); }
   Value(Value &&rhs) noexcept = default;
-  Value(Object obj);
-  Value(Array arr);
+  Value(const Object &obj);
+  Value(Object&& obj);
+  Value(const Array& arr);
+  Value(Array&& arr);
   Value &operator=(const Value &rhs);
   Value &operator=(Value &&rhs) = default;
   Value &operator[](size_t idx);
@@ -61,6 +66,8 @@ public:
   const Array &to_array() const;
   Object &to_object();
   const Object &to_object() const;
+  Value &at(size_t idx);
+  Value &at(const std::string &key);
   const Value &at(size_t idx) const;
   const Value &at(const std::string &key) const;
 
@@ -116,6 +123,9 @@ public:
   iterator find(const std::string &key) { return object_data_.find(key); }
   const_iterator find(const std::string &key) const {
     return object_data_.find(key);
+  }
+  object_t::mapped_type &at(const std::string &key) {
+    return object_data_.at(key);
   }
   const object_t::mapped_type &at(const std::string &key) const {
     return object_data_.at(key);
@@ -173,6 +183,7 @@ public:
     return array_data_.crbegin();
   }
   const_reverse_iterator crend() const noexcept { return array_data_.crend(); }
+  array_t::reference at(size_t idx) { return array_data_.at(idx); }
   array_t::const_reference at(size_t idx) const { return array_data_.at(idx); }
   iterator erase(iterator pos) { return array_data_.erase(pos); }
   const_iterator erase(const_iterator pos) { return array_data_.erase(pos); }
@@ -240,8 +251,4 @@ private:
   const char *errorToStr() const;
   ParseError err_;
 };
-
-std::string escapeJson(const std::string &str);
-
-std::string unescapeJson(const std::string &str);
 } // namespace smalljson
