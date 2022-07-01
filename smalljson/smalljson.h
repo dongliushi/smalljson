@@ -45,10 +45,19 @@ public:
   Value(Array arr);
   Value &operator=(const Value &rhs);
   Value &operator=(Value &&rhs) = default;
+  Value &operator[](size_t idx);
+  Value &operator[](const std::string &key);
 
 public:
-  void print();
+  bool isNull();
+  bool isNumber();
+  bool isArray();
+  bool isObject();
+  bool isString();
+  bool isBoolean();
   std::string to_string();
+  Array &to_array();
+  Object &to_object();
   template <typename... Args>
   Value(ValueType type, Args &&...args)
       : type_(type), value_data_(std::forward<Args>(args)...) {
@@ -76,9 +85,9 @@ public:
       : object_data_(init_list) {}
   Object &operator=(const Object &rhs) = default;
   Object &operator=(Object &&rhs) = default;
+  Value &operator[](const std::string &key);
 
 public:
-  void print();
   std::string to_string();
 
 private:
@@ -99,9 +108,9 @@ public:
       : array_data_(init_list) {}
   Array &operator=(const Array &rhs) = default;
   Array &operator=(Array &&rhs) = default;
+  Value &operator[](size_t idx);
 
 public:
-  void print();
   std::string to_string();
 
 private:
@@ -150,6 +159,7 @@ public:
     BAD_BOOLEAN,
     BAD_NULL,
     BAD_NUMBER,
+    BAD_TYPE
   };
   explicit Exception(ParseError err) : err_(err) {}
   const char *what() const noexcept { return errorToStr(); }

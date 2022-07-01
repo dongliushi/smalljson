@@ -26,6 +26,52 @@ void Value::deepCopy(const Value::value_t &rhs) {
   }
 }
 
+bool Value::isBoolean() {
+  if (type_ == ValueType::Boolean) {
+    return true;
+  }
+  return false;
+}
+
+bool Value::isArray() {
+  if (type_ == ValueType::Array) {
+    return true;
+  }
+  return false;
+}
+
+bool Value::isNull() {
+  if (type_ == ValueType::Null) {
+    return true;
+  }
+  return true;
+}
+
+bool Value::isNumber() {
+  if (type_ == ValueType::Number) {
+    return true;
+  }
+  return false;
+}
+
+bool Value::isObject() {
+  if (type_ == ValueType::Object) {
+    return true;
+  }
+  return false;
+}
+
+bool Value::isString() {
+  if (type_ == ValueType::String) {
+    return true;
+  }
+  return false;
+}
+
+Value &Value::operator[](size_t idx) { return to_array()[idx]; }
+
+Value &Value::operator[](const std::string &key) { return to_object()[key]; }
+
 std::string Value::to_string() {
   switch (type_) {
   case ValueType::Null:
@@ -44,21 +90,18 @@ std::string Value::to_string() {
   }
 }
 
-void Value::print() {
-  if (auto pval = std::get_if<std::string>(&value_data_)) {
-    std::cout << *pval << std::endl;
-    value_data_ = *pval;
-  } else if (auto pval = std::get_if<object_ptr>(&value_data_)) {
-    std::get<object_ptr>(value_data_)->print();
-  } else if (auto pval = std::get_if<array_ptr>(&value_data_)) {
-    std::get<array_ptr>(value_data_)->print();
+Array &Value::to_array() {
+  if (isArray()) {
+    return *std::get<array_ptr>(value_data_);
   }
+  throw Exception(Exception::ParseError::BAD_TYPE);
 }
 
-void Object::print() {
-  for (auto &x : object_data_) {
-    x.second.print();
+Object &Value::to_object() {
+  if (isObject()) {
+    return *std::get<object_ptr>(value_data_);
   }
+  throw Exception(Exception::ParseError::BAD_TYPE);
 }
 
 std::string Object::to_string() {
@@ -71,11 +114,7 @@ std::string Object::to_string() {
   return str;
 }
 
-void Array::print() {
-  for (auto &x : array_data_) {
-    x.print();
-  }
-}
+Value &Object::operator[](const std::string &key) { return object_data_[key]; }
 
 std::string Array::to_string() {
   std::string str = "[";
@@ -86,6 +125,8 @@ std::string Array::to_string() {
   str += "]";
   return str;
 }
+
+Value &Array::operator[](size_t idx) { return array_data_[idx]; }
 
 Value Parser::parseStart() {
   skipWhiteSpace();
@@ -417,6 +458,8 @@ const char *Exception::errorToStr() const {
     return "bad null";
   case ParseError::BAD_NUMBER:
     return "bad number";
+  case ParseError::BAD_TYPE:
+    return "bad type";
   default:
     return "other error";
   }
