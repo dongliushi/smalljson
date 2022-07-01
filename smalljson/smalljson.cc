@@ -26,53 +26,11 @@ void Value::deepCopy(const Value::value_t &rhs) {
   }
 }
 
-bool Value::isBoolean() {
-  if (type_ == ValueType::Boolean) {
-    return true;
-  }
-  return false;
-}
-
-bool Value::isArray() {
-  if (type_ == ValueType::Array) {
-    return true;
-  }
-  return false;
-}
-
-bool Value::isNull() {
-  if (type_ == ValueType::Null) {
-    return true;
-  }
-  return true;
-}
-
-bool Value::isNumber() {
-  if (type_ == ValueType::Number) {
-    return true;
-  }
-  return false;
-}
-
-bool Value::isObject() {
-  if (type_ == ValueType::Object) {
-    return true;
-  }
-  return false;
-}
-
-bool Value::isString() {
-  if (type_ == ValueType::String) {
-    return true;
-  }
-  return false;
-}
-
 Value &Value::operator[](size_t idx) { return to_array()[idx]; }
 
 Value &Value::operator[](const std::string &key) { return to_object()[key]; }
 
-std::string Value::to_string() {
+const std::string Value::to_string() const {
   switch (type_) {
   case ValueType::Null:
     return "null";
@@ -91,6 +49,7 @@ std::string Value::to_string() {
 }
 
 Array &Value::to_array() {
+  std::cout << "1\n";
   if (isArray()) {
     return *std::get<array_ptr>(value_data_);
   }
@@ -104,7 +63,27 @@ Object &Value::to_object() {
   throw Exception(Exception::ParseError::BAD_TYPE);
 }
 
-std::string Object::to_string() {
+const Array &Value::to_array() const {
+  if (isArray()) {
+    return *std::get<array_ptr>(value_data_);
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
+}
+
+const Object &Value::to_object() const {
+  if (isObject()) {
+    return *std::get<object_ptr>(value_data_);
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
+}
+
+const Value &Value::at(size_t idx) const { return to_array().at(idx); }
+
+const Value &Value::at(const std::string &key) const {
+  return to_object().at(key);
+}
+
+const std::string Object::to_string() const {
   std::string str = "{";
   for (auto &[key, value] : object_data_) {
     str += "\"" + escapeJson(key) + "\":" + value.to_string() + ",";
@@ -116,7 +95,11 @@ std::string Object::to_string() {
 
 Value &Object::operator[](const std::string &key) { return object_data_[key]; }
 
-std::string Array::to_string() {
+Value &Object::operator[](std::string &&key) {
+  return object_data_[std::move(key)];
+}
+
+const std::string Array::to_string() const {
   std::string str = "[";
   for (auto &value : array_data_) {
     str += value.to_string() + ",";

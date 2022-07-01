@@ -49,15 +49,21 @@ public:
   Value &operator[](const std::string &key);
 
 public:
-  bool isNull();
-  bool isNumber();
-  bool isArray();
-  bool isObject();
-  bool isString();
-  bool isBoolean();
-  std::string to_string();
+  bool isNull() const noexcept { return type_ == ValueType::Null; }
+  bool isNumber() const noexcept { return type_ == ValueType::Number; }
+  bool isArray() const noexcept { return type_ == ValueType::Array; }
+  bool isObject() const noexcept { return type_ == ValueType::Object; }
+  bool isString() const noexcept { return type_ == ValueType::String; }
+  bool isBoolean() const noexcept { return type_ == ValueType::Boolean; }
+  ValueType type() const noexcept { return type_; }
+  const std::string to_string() const;
   Array &to_array();
+  const Array &to_array() const;
   Object &to_object();
+  const Object &to_object() const;
+  const Value &at(size_t idx) const;
+  const Value &at(const std::string &key) const;
+
   template <typename... Args>
   Value(ValueType type, Args &&...args)
       : type_(type), value_data_(std::forward<Args>(args)...) {
@@ -74,6 +80,10 @@ private:
 class Object {
 public:
   typedef std::map<std::string, Value> object_t;
+  typedef object_t::iterator iterator;
+  typedef object_t::const_iterator const_iterator;
+  typedef object_t::reverse_iterator reverse_iterator;
+  typedef object_t::const_reverse_iterator const_reverse_iterator;
 
 public:
   Object() = default;
@@ -86,9 +96,43 @@ public:
   Object &operator=(const Object &rhs) = default;
   Object &operator=(Object &&rhs) = default;
   Value &operator[](const std::string &key);
+  Value &operator[](std::string &&key);
+  iterator begin() noexcept { return object_data_.begin(); }
+  iterator end() noexcept { return object_data_.end(); }
+  const_iterator begin() const noexcept { return object_data_.begin(); }
+  const_iterator end() const noexcept { return object_data_.end(); }
+  const_iterator cbegin() const noexcept { return object_data_.cbegin(); }
+  const_iterator cend() const noexcept { return object_data_.cend(); }
+  reverse_iterator rbegin() noexcept { return object_data_.rbegin(); }
+  reverse_iterator rend() noexcept { return object_data_.rend(); }
+  const_reverse_iterator rbegin() const noexcept {
+    return object_data_.rbegin();
+  }
+  const_reverse_iterator rend() const noexcept { return object_data_.rend(); }
+  const_reverse_iterator crbegin() const noexcept {
+    return object_data_.crbegin();
+  }
+  const_reverse_iterator crend() const noexcept { return object_data_.crend(); }
+  iterator find(const std::string &key) { return object_data_.find(key); }
+  const_iterator find(const std::string &key) const {
+    return object_data_.find(key);
+  }
+  const object_t::mapped_type &at(const std::string &key) const {
+    return object_data_.at(key);
+  }
+  object_t::size_type erase(const std::string &key) {
+    return object_data_.erase(key);
+  }
+  iterator erase(iterator pos) { return object_data_.erase(pos); }
+  const_iterator erase(const_iterator pos) { return object_data_.erase(pos); }
+  iterator erase(const_iterator first, const_iterator last) {
+    return object_data_.erase(first, last);
+  }
+  bool empty() const noexcept { return object_data_.empty(); }
+  void clear() noexcept { object_data_.clear(); }
 
 public:
-  std::string to_string();
+  const std::string to_string() const;
 
 private:
   object_t object_data_;
@@ -97,6 +141,10 @@ private:
 class Array {
 public:
   typedef std::vector<Value> array_t;
+  typedef array_t::iterator iterator;
+  typedef array_t::const_iterator const_iterator;
+  typedef array_t::reverse_iterator reverse_iterator;
+  typedef array_t::const_reverse_iterator const_reverse_iterator;
 
 public:
   Array() = default;
@@ -109,9 +157,33 @@ public:
   Array &operator=(const Array &rhs) = default;
   Array &operator=(Array &&rhs) = default;
   Value &operator[](size_t idx);
+  iterator begin() noexcept { return array_data_.begin(); }
+  iterator end() noexcept { return array_data_.end(); }
+  const_iterator begin() const noexcept { return array_data_.begin(); }
+  const_iterator end() const noexcept { return array_data_.end(); }
+  const_iterator cbegin() const noexcept { return array_data_.cbegin(); }
+  const_iterator cend() const noexcept { return array_data_.cend(); }
+  reverse_iterator rbegin() noexcept { return array_data_.rbegin(); }
+  reverse_iterator rend() noexcept { return array_data_.rend(); }
+  const_reverse_iterator rbegin() const noexcept {
+    return array_data_.rbegin();
+  }
+  const_reverse_iterator rend() const noexcept { return array_data_.rend(); }
+  const_reverse_iterator crbegin() const noexcept {
+    return array_data_.crbegin();
+  }
+  const_reverse_iterator crend() const noexcept { return array_data_.crend(); }
+  array_t::const_reference at(size_t idx) const { return array_data_.at(idx); }
+  iterator erase(iterator pos) { return array_data_.erase(pos); }
+  const_iterator erase(const_iterator pos) { return array_data_.erase(pos); }
+  iterator erase(const_iterator first, const_iterator last) {
+    return array_data_.erase(first, last);
+  }
+  bool empty() const noexcept { return array_data_.empty(); }
+  void clear() noexcept { array_data_.clear(); }
 
 public:
-  std::string to_string();
+  const std::string to_string() const;
 
 private:
   array_t array_data_;
