@@ -61,6 +61,10 @@ public:
   bool isString() const noexcept { return type_ == ValueType::String; }
   bool isBoolean() const noexcept { return type_ == ValueType::Boolean; }
   ValueType type() const noexcept { return type_; }
+  bool to_boolean() const;
+  int to_integer() const;
+  float to_float() const;
+  double to_double() const;
   const std::string to_print() const;
   const std::string to_string() const;
   Array &to_array();
@@ -80,6 +84,8 @@ public:
   }
 
 private:
+  const std::string to_raw_string() const;
+  std::string to_raw_string();
   void deepCopy(const value_t &rhs);
   ValueType type_;
   value_t value_data_;

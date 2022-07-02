@@ -37,9 +37,52 @@ void Value::deepCopy(const Value::value_t &rhs) {
   }
 }
 
+const std::string Value::to_raw_string() const {
+  return std::get<std::string>(value_data_);
+}
+
+std::string Value::to_raw_string() {
+  return std::get<std::string>(value_data_);
+}
+
 Value &Value::operator[](size_t idx) { return to_array()[idx]; }
 
 Value &Value::operator[](const std::string &key) { return to_object()[key]; }
+
+bool Value::to_boolean() const {
+  if (isBoolean()) {
+    const std::string &b_str = to_raw_string();
+    if (b_str == "true") {
+      return true;
+    } else if (b_str == "false") {
+      return false;
+    } else {
+      throw Exception(Exception::ParseError::BAD_TYPE);
+    }
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
+}
+
+int Value::to_integer() const {
+  if (isNumber()) {
+    return std::stoi(to_raw_string());
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
+}
+
+float Value::to_float() const {
+  if (isNumber()) {
+    return std::stof(to_raw_string());
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
+}
+
+double Value::to_double() const {
+  if (isNumber()) {
+    return std::stof(to_raw_string());
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
+}
 
 const std::string Value::to_print() const {
   switch (type_) {
