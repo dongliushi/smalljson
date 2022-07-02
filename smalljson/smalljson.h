@@ -45,9 +45,9 @@ public:
   Value(const Value &rhs) : type_(rhs.type_) { deepCopy(rhs.value_data_); }
   Value(Value &&rhs) noexcept = default;
   Value(const Object &obj);
-  Value(Object&& obj);
-  Value(const Array& arr);
-  Value(Array&& arr);
+  Value(Object &&obj);
+  Value(const Array &arr);
+  Value(Array &&arr);
   Value &operator=(const Value &rhs);
   Value &operator=(Value &&rhs) = default;
   Value &operator[](size_t idx);
@@ -61,6 +61,7 @@ public:
   bool isString() const noexcept { return type_ == ValueType::String; }
   bool isBoolean() const noexcept { return type_ == ValueType::Boolean; }
   ValueType type() const noexcept { return type_; }
+  const std::string to_print() const;
   const std::string to_string() const;
   Array &to_array();
   const Array &to_array() const;
@@ -142,7 +143,7 @@ public:
   void clear() noexcept { object_data_.clear(); }
 
 public:
-  const std::string to_string() const;
+  const std::string to_print() const;
 
 private:
   object_t object_data_;
@@ -194,7 +195,7 @@ public:
   void clear() noexcept { array_data_.clear(); }
 
 public:
-  const std::string to_string() const;
+  const std::string to_print() const;
 
 private:
   array_t array_data_;

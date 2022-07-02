@@ -41,7 +41,7 @@ Value &Value::operator[](size_t idx) { return to_array()[idx]; }
 
 Value &Value::operator[](const std::string &key) { return to_object()[key]; }
 
-const std::string Value::to_string() const {
+const std::string Value::to_print() const {
   switch (type_) {
   case ValueType::Null:
     return "null";
@@ -51,12 +51,19 @@ const std::string Value::to_string() const {
   case ValueType::String:
     return "\"" + std::get<std::string>(value_data_) + "\"";
   case ValueType::Object:
-    return std::get<object_ptr>(value_data_)->to_string();
+    return std::get<object_ptr>(value_data_)->to_print();
   case ValueType::Array:
-    return std::get<array_ptr>(value_data_)->to_string();
+    return std::get<array_ptr>(value_data_)->to_print();
   default:
     throw Exception(Exception::ParseError::NOT_JSON);
   }
+}
+
+const std::string Value::to_string() const {
+  if (isString()) {
+    return unescapeJson(std::get<std::string>(value_data_));
+  }
+  throw Exception(Exception::ParseError::BAD_TYPE);
 }
 
 Array &Value::to_array() {
@@ -97,10 +104,10 @@ const Value &Value::at(const std::string &key) const {
   return to_object().at(key);
 }
 
-const std::string Object::to_string() const {
+const std::string Object::to_print() const {
   std::string str = "{";
   for (auto &[key, value] : object_data_) {
-    str += "\"" + escapeJson(key) + "\":" + value.to_string() + ",";
+    str += "\"" + escapeJson(key) + "\":" + value.to_print() + ",";
   }
   str.pop_back();
   str += "}";
@@ -113,10 +120,10 @@ Value &Object::operator[](std::string &&key) {
   return object_data_[std::move(key)];
 }
 
-const std::string Array::to_string() const {
+const std::string Array::to_print() const {
   std::string str = "[";
   for (auto &value : array_data_) {
-    str += value.to_string() + ",";
+    str += value.to_print() + ",";
   }
   str.pop_back();
   str += "]";
