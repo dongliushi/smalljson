@@ -61,6 +61,7 @@ public:
   bool isString() const noexcept { return type_ == ValueType::String; }
   bool isBoolean() const noexcept { return type_ == ValueType::Boolean; }
   ValueType type() const noexcept { return type_; }
+  bool empty() const noexcept { return isNull(); }
   bool to_boolean() const;
   int to_integer() const;
   float to_float() const;

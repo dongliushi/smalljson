@@ -110,6 +110,9 @@ const std::string Value::to_string() const {
 }
 
 Array &Value::to_array() {
+  if (empty()) {
+    *this = Array();
+  }
   if (isArray()) {
     return *std::get<array_ptr>(value_data_);
   }
@@ -117,6 +120,9 @@ Array &Value::to_array() {
 }
 
 Object &Value::to_object() {
+  if (empty()) {
+    *this = Object();
+  }
   if (isObject()) {
     return *std::get<object_ptr>(value_data_);
   }
