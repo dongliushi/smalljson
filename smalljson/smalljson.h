@@ -147,6 +147,7 @@ public:
     return object_data_.erase(first, last);
   }
   bool empty() const noexcept { return object_data_.empty(); }
+  size_t size() const noexcept { return object_data_.size(); }
   void clear() noexcept { object_data_.clear(); }
 
 public:
@@ -198,6 +199,7 @@ public:
   iterator erase(const_iterator first, const_iterator last) {
     return array_data_.erase(first, last);
   }
+  size_t size() const noexcept { return array_data_.size(); }
   bool empty() const noexcept { return array_data_.empty(); }
   void clear() noexcept { array_data_.clear(); }
 
