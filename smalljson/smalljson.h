@@ -29,13 +29,22 @@ public:
 public:
   Value() : type_(ValueType::Null) {}
   ~Value() = default;
-  Value(size_t num)
+  Value(int num) : type_(ValueType::Number), value_data_(std::to_string(num)) {}
+  Value(unsigned int num)
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
-  Value(ssize_t num)
+  Value(long num)
+      : type_(ValueType::Number), value_data_(std::to_string(num)) {}
+  Value(unsigned long num)
+      : type_(ValueType::Number), value_data_(std::to_string(num)) {}
+  Value(long long num)
+      : type_(ValueType::Number), value_data_(std::to_string(num)) {}
+  Value(unsigned long long num)
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
   Value(float num)
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
   Value(double num)
+      : type_(ValueType::Number), value_data_(std::to_string(num)) {}
+  Value(long double num)
       : type_(ValueType::Number), value_data_(std::to_string(num)) {}
   Value(bool boolean)
       : type_(ValueType::Boolean), value_data_(boolean ? "true" : "false") {}
