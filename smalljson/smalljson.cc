@@ -158,7 +158,9 @@ const std::string Object::to_print() const {
   for (auto &[key, value] : object_data_) {
     str += "\"" + escapeJson(key) + "\":" + value.to_print() + ",";
   }
-  str.pop_back();
+  if (*(str.end() - 1) == ',') {
+    str.pop_back();
+  }
   str += "}";
   return str;
 }
@@ -174,7 +176,9 @@ const std::string Array::to_print() const {
   for (auto &value : array_data_) {
     str += value.to_print() + ",";
   }
-  str.pop_back();
+  if (*(str.end() - 1) == ',') {
+    str.pop_back();
+  }
   str += "]";
   return str;
 }

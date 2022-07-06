@@ -158,6 +158,11 @@ public:
   bool empty() const noexcept { return object_data_.empty(); }
   size_t size() const noexcept { return object_data_.size(); }
   void clear() noexcept { object_data_.clear(); }
+  template <typename... Args> decltype(auto) emplace(Args &&...args) {
+    static_assert(std::is_constructible<object_t::value_type, Args...>::value,
+                  "object params error");
+    return object_data_.emplace(std::forward<Args>(args)...);
+  }
 
 public:
   const std::string to_print() const;
@@ -211,6 +216,11 @@ public:
   size_t size() const noexcept { return array_data_.size(); }
   bool empty() const noexcept { return array_data_.empty(); }
   void clear() noexcept { array_data_.clear(); }
+  template <typename... Args> decltype(auto) emplace_back(Args &&...args) {
+    static_assert(std::is_constructible<array_t::value_type, Args...>::value,
+                  "array parames error");
+    return array_data_.emplace_back(std::forward<Args>(args)...);
+  }
 
 public:
   const std::string to_print() const;
